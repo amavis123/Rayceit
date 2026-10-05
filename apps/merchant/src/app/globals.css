@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/* Design tokens — racyeit.md Section 6. Merchant dashboard: flat,
+   bordered, tighter corners, built for glare/kitchen-lighting legibility.
+   No Archivo here — display type is customer-app only. */
+:root {
+  --track-ink: #12151a;
+  --checkpoint-grey: #6b7280;
+  --track-green: #16d9a6;
+  --surface-white: #ffffff;
+  --amber-flag: #ffb020;
+  --red-flag: #e5484d;
+  --pit-complete: #1fae7a;
+
+  --background: var(--surface-white);
+  --foreground: var(--track-ink);
+}
+
+@theme inline {
+  --color-track-ink: var(--track-ink);
+  --color-checkpoint-grey: var(--checkpoint-grey);
+  --color-track-green: var(--track-green);
+  --color-surface-white: var(--surface-white);
+  --color-amber-flag: var(--amber-flag);
+  --color-red-flag: var(--red-flag);
+  --color-pit-complete: var(--pit-complete);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}

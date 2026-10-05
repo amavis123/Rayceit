@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "customer",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "customer", "dev"],
+      "port": 3002
+    },
+    {
+      "name": "merchant",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "merchant", "dev"],
+      "port": 3003
+    },
+    {
+      "name": "backend",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "backend", "run", "start:dev"],
+      "port": 3001
+    }
+  ]
+}

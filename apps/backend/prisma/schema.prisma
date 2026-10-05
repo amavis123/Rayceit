@@ -1,0 +1,139 @@
+// Mirrors racyeit.md Section 5 (Data Model). Keep in sync with
+// packages/shared/src/types.ts, which is what the frontends consume.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  clerkUserId  String   @unique
+  name         String
+  email        String   @unique
+  authProvider String
+  createdAt    DateTime @default(now())
+
+  races             Race[]
+  orders            Order[]
+  locationPings     LocationPing[]
+  merchants         Merchant[]
+  pushSubscriptions PushSubscription[]
+}
+
+model Merchant {
+  id                    String  @id @default(cuid())
+  ownerId               String
+  businessName          String
+  category              String
+  address               String
+  lat                   Float
+  lng                   Float
+  stripeConnectAccountId String?
+  stripeOnboardingComplete Boolean @default(false)
+  status                String  @default("onboarding")
+  logoUrl                String?
+
+  owner    User      @relation(fields: [ownerId], references: [id])
+  products Product[]
+  orders   Order[]
+
+  @@index([ownerId])
+}
+
+model Product {
+  id              String  @id @default(cuid())
+  merchantId      String
+  name            String
+  description     String
+  price           Decimal
+  photoUrl        String?
+  prepTimeMinutes Int
+  isActive        Boolean @default(true)
+
+  merchant Merchant @relation(fields: [merchantId], references: [id])
+
+  @@index([merchantId])
+}
+
+model Race {
+  id                String    @id @default(cuid())
+  customerId        String
+  status            String    @default("planning")
+  timeBudgetMinutes Int?
+  startedAt         DateTime?
+  completedAt       DateTime?
+
+  customer      User           @relation(fields: [customerId], references: [id])
+  orders        Order[]
+  locationPings LocationPing[]
+
+  @@index([customerId])
+}
+
+model Order {
+  id            String    @id @default(cuid())
+  raceId        String
+  stopSequence  Int
+  customerId    String
+  merchantId    String
+  items         Json
+  status        String    @default("pending")
+  createdAt     DateTime  @default(now())
+  etaAtOrderTime DateTime?
+  currentEta    DateTime?
+  confirmationCode String
+
+  approachingNotifiedAt DateTime?
+
+  race     Race      @relation(fields: [raceId], references: [id])
+  customer User      @relation(fields: [customerId], references: [id])
+  merchant Merchant  @relation(fields: [merchantId], references: [id])
+  payment  Payment?
+
+  @@index([raceId])
+  @@index([merchantId])
+}
+
+model Payment {
+  id                     String  @id @default(cuid())
+  orderId                String  @unique
+  amount                 Decimal
+  commissionAmount       Decimal
+  merchantPayoutAmount   Decimal
+  stripePaymentIntentId  String?
+  stripeTransferId       String?
+  status                 String  @default("pending")
+
+  order Order @relation(fields: [orderId], references: [id])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model LocationPing {
+  id         String   @id @default(cuid())
+  raceId     String
+  customerId String
+  lat        Float
+  lng        Float
+  timestamp  DateTime @default(now())
+
+  race     Race @relation(fields: [raceId], references: [id])
+  customer User @relation(fields: [customerId], references: [id])
+
+  @@index([raceId, timestamp])
+}
